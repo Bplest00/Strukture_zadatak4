@@ -141,18 +141,74 @@ int CitajDatoteku(FILE* in, position head1, position head2) {
 	return 0;
 }
 
+int pomnozi(position produkthead, position head1, position head2) {
+	position j = NULL;
+	position i = NULL;
+	for (i = head1->next;i != NULL;i = i->next) {
+		for (j = head2->next;j != NULL;j = j->next) {
+			position novi_elem = Stvori(i->exp + j->exp, i->koef * j->koef);
+			if (!novi_elem) {
+				return -1;
+			}
+			SortirajUnesi(produkthead, novi_elem);
+		}
+	}
+	return 0;
+}
+int zbroji(position zbrojhead, position head1, position head2) {
+	position i = head1->next;
+	position j = head2->next;
+	position k = zbrojhead;
+	position temp = NULL;
+	//PRVA PETLJA DOK NE DODEMO DO KRAJA POLINOMA NAKON TOGA PROVJERA DO CIJEG KRAJA SMO DOSLI
+	while (i != NULL && j != NULL) {
+		if (i->exp == j->exp) {
+			StvoriUnesiNakon(zbrojhead, i->koef + j->koef, i->exp);
+			i = i->next;
+			j = j->next;
+		}
+		else if (i->exp > j->exp) {
+			StvoriUnesiNakon(zbrojhead, i->koef, i->exp);
+
+		}
+		else {
+			StvoriUnesiNakon(zbrojhead, j->koef, j->exp);
+			j = j->next;
+		}
+
+	}
+	if (i == NULL) { temp = j; }
+	if (j == NULL) { temp = i; }
+	while (temp != NULL) {
+		StvoriUnesiNakon(zbrojhead, temp->koef, temp->exp);
+		temp = temp->next;
+	}
+
+	return 0;
+}
+
+
 int main() {
 	FILE *in=NULL;
 	char path[MAXPATH];
 	polinom head1 = { .koef = 0, .exp = 0, .next = NULL };
 	polinom head2 = { .koef = 0, .exp = 0, .next = NULL }; 
-	polinom suma = { .koef = 0, .exp = 0, .next = NULL };
+	polinom produkt = { .koef = 0, .exp = 0, .next = NULL };
 	polinom zbroj = { .koef = 0, .exp = 0, .next = NULL };
 	                          // ---> Petlja za otvaranje datoteke
 	while (in == NULL) {
 		scanf("%s", path);
 		in = OtvoriDatoteku(path, in);
 	}
+	CitajDatoteku(in, &head1, &head2);
+	zbroji(&zbroj, &head1, &head2);
+	pomnozi(&produkt, &head1, &head2);
+	BrisiListu(&head1);
+	BrisiListu(&head2);
+	BrisiListu(&produkt);
+	BrisiListu(&zbroj);
+	return 0;
+	
 
 }
 
